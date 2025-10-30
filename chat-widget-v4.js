@@ -1,24 +1,49 @@
 // Chat Widget Script
 (function() {
-    // Inject Sora font
-    const fontLink = document.createElement('link');
-    fontLink.rel = 'stylesheet';
-    fontLink.href = 'https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap';
-    document.head.appendChild(fontLink);
-    // Creative, glassmorphic, circular styles
+    // Read configuration from window.ChatWidgetConfig
+    const config = window.ChatWidgetConfig || {};
+    
+    // Default configuration
+    const defaultConfig = {
+        colorPrimary: '#ff6bcb',
+        colorSecondary: '#7367f0',
+        colorGlass: 'rgba(255,255,255,0.7)',
+        colorFont: '#232946',
+        font: 'Sora',
+        brandName: 'ChatBot',
+        mascot: '🤖',
+        position: { bottom: '32px', right: '32px' },
+        webhookUrl: '',
+        width: '420px',
+        height: '620px',
+        borderRadius: '32px'
+    };
+    
+    // Merge config with defaults
+    const settings = { ...defaultConfig, ...config };
+    
+    // Inject font if specified
+    if (settings.font) {
+        const fontLink = document.createElement('link');
+        fontLink.rel = 'stylesheet';
+        fontLink.href = `https://fonts.googleapis.com/css2?family=${settings.font.replace(' ', '+')}:wght@400;600;700&display=swap`;
+        document.head.appendChild(fontLink);
+    }
+    
+    // Creative, glassmorphic, circular styles with configurable values
     const styles = `
         .n8n-chat-widget {
-            --chat--color-primary: #ff6bcb;
-            --chat--color-secondary: #7367f0;
-            --chat--color-glass: rgba(255,255,255,0.7);
+            --chat--color-primary: ${settings.colorPrimary};
+            --chat--color-secondary: ${settings.colorSecondary};
+            --chat--color-glass: ${settings.colorGlass};
             --chat--color-glass-blur: blur(16px);
-            --chat--color-font: #232946;
-            font-family: 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            --chat--color-font: ${settings.colorFont};
+            font-family: '${settings.font}', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         }
         .n8n-chat-widget .chat-toggle {
             position: fixed;
-            bottom: 32px;
-            right: 32px;
+            bottom: ${settings.position.bottom};
+            right: ${settings.position.right};
             width: 72px;
             height: 72px;
             border-radius: 50%;
@@ -45,10 +70,10 @@
         .n8n-chat-widget .chat-container {
             position: fixed;
             bottom: 120px;
-            right: 32px;
-            width: 420px;
-            height: 620px;
-            border-radius: 32px;
+            right: ${settings.position.right};
+            width: ${settings.width};
+            height: ${settings.height};
+            border-radius: ${settings.borderRadius};
             background: var(--chat--color-glass);
             backdrop-filter: var(--chat--color-glass-blur);
             box-shadow: 0 12px 48px rgba(115, 103, 240, 0.18);
@@ -73,7 +98,7 @@
             padding: 24px;
             font-size: 20px;
             font-weight: 700;
-            border-radius: 32px 32px 0 0;
+            border-radius: ${settings.borderRadius} ${settings.borderRadius} 0 0;
             display: flex;
             align-items: center;
             gap: 12px;
@@ -151,7 +176,7 @@
             gap: 12px;
             padding: 20px;
             background: rgba(255,255,255,0.6);
-            border-radius: 0 0 32px 32px;
+            border-radius: 0 0 ${settings.borderRadius} ${settings.borderRadius};
             backdrop-filter: blur(8px);
         }
         .n8n-chat-widget .chat-input textarea {
@@ -195,56 +220,70 @@
     const styleEl = document.createElement('style');
     styleEl.textContent = styles;
     document.head.appendChild(styleEl);
+    
     // Widget container
     const widgetContainer = document.createElement('div');
     widgetContainer.className = 'n8n-chat-widget';
     document.body.appendChild(widgetContainer);
+    
     // Toggle button
     const toggleButton = document.createElement('button');
     toggleButton.className = 'chat-toggle';
     toggleButton.setAttribute('aria-label', 'Toggle chat');
     toggleButton.innerHTML = `
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2C6.48 2 2 6.48 2 12c0 1.54.36 3 .97 4.29L2 22l5.71-.97C9 21.64 10.46 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.33 0-2.58-.28-3.72-.78l-.27-.15-2.85.48.48-2.85-.15-.27C4.28 14.58 4 13.33 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8z"/>
+            <path d="M12 2C6.48 2 2 6.48 2 12c0 1.54.36 3 .97 4.29L2 22l5.71-.97C9 21.64 10.46 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.33 0-2.58-.28-3.72-.78l-.27-.15-2.85.48.48-2.85-.15-.27C4.28 14.58 4 13.33 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8z"></path>
         </svg>
     `;
     widgetContainer.appendChild(toggleButton);
+    
     // Chat container
     const chatContainer = document.createElement('div');
     chatContainer.className = 'chat-container';
     widgetContainer.appendChild(chatContainer);
+    
     // Brand header with mascot
     const brandHeader = document.createElement('div');
     brandHeader.className = 'brand-header';
     brandHeader.innerHTML = `
-        <div class="mascot" title="Mascot">🤖</div>
-        ChatBot
-        <button aria-label="Close chat" class="close-button">×</button>
+        <div class="mascot" title="Mascot">${settings.mascot}</div>
+        ${settings.brandName}
+        <button class="close-button" aria-label="Close chat">×</button>
     `;
     chatContainer.appendChild(brandHeader);
+    
     // Chat messages area
     const messagesContainer = document.createElement('div');
     messagesContainer.className = 'chat-messages';
     chatContainer.appendChild(messagesContainer);
-    // Chat input area
+    
+    // Chat input area with SVG send icon
     const chatInput = document.createElement('div');
     chatInput.className = 'chat-input';
     chatInput.innerHTML = `
         <textarea placeholder="Type your message..." rows="1"></textarea>
-        <button aria-label="Send" type="submit"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
+        <button type="submit" aria-label="Send">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+            </svg>
+        </button>
     `;
     chatContainer.appendChild(chatInput);
+    
     // Show/hide chat
     toggleButton.addEventListener('click', () => {
         chatContainer.classList.toggle('open');
     });
+    
     brandHeader.querySelector('.close-button').addEventListener('click', () => {
         chatContainer.classList.remove('open');
     });
-    // Send message logic (placeholder, to be expanded)
+    
+    // Send message logic
     const textarea = chatInput.querySelector('textarea');
     const sendButton = chatInput.querySelector('button');
-    sendButton.addEventListener('click', () => {
+    
+    sendButton.addEventListener('click', async () => {
         const message = textarea.value.trim();
         if (message) {
             const userMessageDiv = document.createElement('div');
@@ -253,9 +292,35 @@
             messagesContainer.appendChild(userMessageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
             textarea.value = '';
-            // TODO: Add bot response, mascot animation, etc.
+            
+            // Send to webhook if configured
+            if (settings.webhookUrl) {
+                try {
+                    const response = await fetch(settings.webhookUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ message: message })
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.response) {
+                            const botMessageDiv = document.createElement('div');
+                            botMessageDiv.className = 'chat-message bot';
+                            botMessageDiv.textContent = data.response;
+                            messagesContainer.appendChild(botMessageDiv);
+                            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error sending message to webhook:', error);
+                }
+            }
         }
     });
+    
     textarea.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
