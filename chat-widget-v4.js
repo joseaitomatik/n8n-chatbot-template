@@ -5,7 +5,6 @@
     fontLink.rel = 'stylesheet';
     fontLink.href = 'https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap';
     document.head.appendChild(fontLink);
-
     // Creative, glassmorphic, circular styles
     const styles = `
         .n8n-chat-widget {
@@ -54,186 +53,187 @@
             backdrop-filter: var(--chat--color-glass-blur);
             box-shadow: 0 12px 48px rgba(115, 103, 240, 0.18);
             border: 2px solid rgba(255,255,255,0.3);
-            overflow: hidden;
-            display: none;
+            z-index: 998;
+            display: flex;
             flex-direction: column;
-            z-index: 1000;
-            animation: popIn 0.5s cubic-bezier(.68,-0.55,.27,1.55);
+            overflow: hidden;
+            opacity: 0;
+            transform: scale(0.9) translateY(20px);
+            transition: opacity 0.3s ease, transform 0.3s cubic-bezier(.68,-0.55,.27,1.55);
+            pointer-events: none;
         }
         .n8n-chat-widget .chat-container.open {
-            display: flex;
-        }
-        @keyframes popIn {
-            0% { transform: scale(0.7) translateY(60px); opacity: 0; }
-            100% { transform: scale(1) translateY(0); opacity: 1; }
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
         }
         .n8n-chat-widget .brand-header {
-            padding: 20px 24px 12px 24px;
+            background: linear-gradient(135deg, var(--chat--color-primary) 0%, var(--chat--color-secondary) 100%);
+            color: white;
+            padding: 24px;
+            font-size: 20px;
+            font-weight: 700;
+            border-radius: 32px 32px 0 0;
             display: flex;
             align-items: center;
-            gap: 16px;
-            background: transparent;
-            border-bottom: none;
+            gap: 12px;
             position: relative;
         }
         .n8n-chat-widget .mascot {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #ffb86b 0%, #ff6bcb 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            box-shadow: 0 2px 8px rgba(255,107,203,0.12);
-            margin-right: 8px;
+            font-size: 28px;
+            animation: float 3s ease-in-out infinite;
         }
-        .n8n-chat-widget .brand-header span {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--chat--color-font);
-            letter-spacing: -0.5px;
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
         }
         .n8n-chat-widget .close-button {
             position: absolute;
             right: 20px;
             top: 50%;
             transform: translateY(-50%);
-            background: none;
+            background: rgba(255,255,255,0.2);
+            color: white;
             border: none;
-            color: var(--chat--color-font);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
             cursor: pointer;
-            font-size: 28px;
-            opacity: 0.5;
-            transition: opacity 0.2s;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
         }
         .n8n-chat-widget .close-button:hover {
-            opacity: 1;
+            background: rgba(255,255,255,0.3);
         }
         .n8n-chat-widget .chat-messages {
             flex: 1;
+            padding: 20px;
             overflow-y: auto;
-            padding: 32px 24px 16px 24px;
-            background: transparent;
             display: flex;
             flex-direction: column;
             gap: 12px;
         }
         .n8n-chat-widget .chat-message {
             max-width: 75%;
-            padding: 16px 22px;
+            padding: 14px 18px;
             border-radius: 24px;
-            font-size: 16px;
-            line-height: 1.6;
-            word-break: break-word;
-            box-shadow: 0 2px 8px rgba(115, 103, 240, 0.08);
-            animation: bubbleIn 0.4s cubic-bezier(.68,-0.55,.27,1.55);
+            font-size: 15px;
+            line-height: 1.5;
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         .n8n-chat-widget .chat-message.user {
-            background: linear-gradient(135deg, #7367f0 0%, #ff6bcb 100%);
-            color: #fff;
+            background: linear-gradient(135deg, var(--chat--color-primary) 0%, var(--chat--color-secondary) 100%);
+            color: white;
             align-self: flex-end;
+            border-bottom-right-radius: 8px;
         }
         .n8n-chat-widget .chat-message.bot {
-            background: var(--chat--color-glass);
+            background: rgba(115, 103, 240, 0.08);
             color: var(--chat--color-font);
             align-self: flex-start;
-            border: 1.5px solid #ffb6b6;
-        }
-        @keyframes bubbleIn {
-            0% { transform: scale(0.8) translateY(20px); opacity: 0; }
-            100% { transform: scale(1) translateY(0); opacity: 1; }
+            border-bottom-left-radius: 8px;
         }
         .n8n-chat-widget .chat-input {
-            padding: 18px 24px;
-            background: transparent;
-            border-top: none;
             display: flex;
-            gap: 10px;
-            align-items: center;
+            gap: 12px;
+            padding: 20px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 0 0 32px 32px;
+            backdrop-filter: blur(8px);
         }
         .n8n-chat-widget .chat-input textarea {
             flex: 1;
-            padding: 14px 18px;
-            border: 1.5px solid #e0e0e0;
-            border-radius: 18px;
-            background: var(--chat--color-glass);
-            color: var(--chat--color-font);
-            resize: none;
+            border: 2px solid rgba(115, 103, 240, 0.2);
+            border-radius: 20px;
+            padding: 12px 18px;
             font-family: inherit;
-            font-size: 16px;
+            font-size: 15px;
+            resize: none;
             outline: none;
-            transition: border 0.2s;
+            transition: border-color 0.2s;
+            background: white;
+            color: var(--chat--color-font);
         }
         .n8n-chat-widget .chat-input textarea:focus {
-            border: 1.5px solid #ff6bcb;
+            border-color: var(--chat--color-secondary);
         }
         .n8n-chat-widget .chat-input button {
-            background: linear-gradient(135deg, #ff6bcb 0%, #7367f0 100%);
-            color: white;
-            border: none;
-            border-radius: 50%;
             width: 48px;
             height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--chat--color-primary) 0%, var(--chat--color-secondary) 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
-            cursor: pointer;
             transition: transform 0.2s;
         }
-        .n8n-chat-widget .chat-input button:hover {
-            transform: scale(1.08);
+        .n8n-chat-widget .chat-input button:active {
+            transform: scale(0.95);
+        }
+        .n8n-chat-widget .chat-input button svg {
+            width: 20px;
+            height: 20px;
         }
     `;
-
-    // Inject styles
-    const styleSheet = document.createElement('style');
-    styleSheet.textContent = styles;
-    document.head.appendChild(styleSheet);
-
+    const styleEl = document.createElement('style');
+    styleEl.textContent = styles;
+    document.head.appendChild(styleEl);
     // Widget container
     const widgetContainer = document.createElement('div');
     widgetContainer.className = 'n8n-chat-widget';
     document.body.appendChild(widgetContainer);
-
-    // Chat toggle (FAB)
+    // Toggle button
     const toggleButton = document.createElement('button');
     toggleButton.className = 'chat-toggle';
+    toggleButton.setAttribute('aria-label', 'Toggle chat');
     toggleButton.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" fill="#fff" opacity="0.12"/><path d="M24 12a2 2 0 0 1 2 2v8h8a2 2 0 1 1 0 4h-8v8a2 2 0 1 1-4 0v-8h-8a2 2 0 1 1 0-4h8v-8a2 2 0 0 1 2-2z" fill="currentColor"/></svg>
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2C6.48 2 2 6.48 2 12c0 1.54.36 3 .97 4.29L2 22l5.71-.97C9 21.64 10.46 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.33 0-2.58-.28-3.72-.78l-.27-.15-2.85.48.48-2.85-.15-.27C4.28 14.58 4 13.33 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8z"/>
+        </svg>
     `;
     widgetContainer.appendChild(toggleButton);
-
-    // Chat container (hidden by default)
+    // Chat container
     const chatContainer = document.createElement('div');
     chatContainer.className = 'chat-container';
     widgetContainer.appendChild(chatContainer);
-
     // Brand header with mascot
     const brandHeader = document.createElement('div');
     brandHeader.className = 'brand-header';
     brandHeader.innerHTML = `
         <div class="mascot" title="Mascot">🤖</div>
-        <span>ChatBot</span>
-        <button class="close-button" aria-label="Close chat">×</button>
+        ChatBot
+        <button aria-label="Close chat" class="close-button">×</button>
     `;
     chatContainer.appendChild(brandHeader);
-
     // Chat messages area
     const messagesContainer = document.createElement('div');
     messagesContainer.className = 'chat-messages';
     chatContainer.appendChild(messagesContainer);
-
     // Chat input area
     const chatInput = document.createElement('div');
     chatInput.className = 'chat-input';
     chatInput.innerHTML = `
         <textarea placeholder="Type your message..." rows="1"></textarea>
-        <button type="submit" aria-label="Send message">➤</button>
+        <button aria-label="Send" type="submit"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
     `;
     chatContainer.appendChild(chatInput);
-
     // Show/hide chat
     toggleButton.addEventListener('click', () => {
         chatContainer.classList.toggle('open');
@@ -241,7 +241,6 @@
     brandHeader.querySelector('.close-button').addEventListener('click', () => {
         chatContainer.classList.remove('open');
     });
-
     // Send message logic (placeholder, to be expanded)
     const textarea = chatInput.querySelector('textarea');
     const sendButton = chatInput.querySelector('button');
