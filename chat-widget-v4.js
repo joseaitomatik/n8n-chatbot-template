@@ -2,7 +2,7 @@
 (function() {
     // Read configuration from window.ChatWidgetConfig
     const config = window.ChatWidgetConfig || {};
-    
+
     // Default configuration
     const defaultConfig = {
         colorPrimary: '#ff6bcb',
@@ -18,10 +18,10 @@
         height: '620px',
         borderRadius: '32px'
     };
-    
+
     // Merge config with defaults
     const settings = { ...defaultConfig, ...config };
-    
+
     // Inject font if specified
     if (settings.font) {
         const fontLink = document.createElement('link');
@@ -29,7 +29,7 @@
         fontLink.href = `https://fonts.googleapis.com/css2?family=${settings.font.replace(' ', '+')}:wght@400;600;700&display=swap`;
         document.head.appendChild(fontLink);
     }
-    
+
     // Creative, glassmorphic, circular styles with configurable values
     const styles = `
         .n8n-chat-widget {
@@ -178,6 +178,7 @@
             background: rgba(255,255,255,0.6);
             border-radius: 0 0 ${settings.borderRadius} ${settings.borderRadius};
             backdrop-filter: blur(8px);
+            align-items: center; /* Ensure vertical centering of children */
         }
         .n8n-chat-widget .chat-input textarea {
             flex: 1;
@@ -205,9 +206,10 @@
             cursor: pointer;
             font-size: 20px;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            align-items: center; /* center icon vertically */
+            justify-content: center; /* center icon horizontally */
             transition: transform 0.2s;
+            align-self: center; /* ensure the button itself centers vertically in the row */
         }
         .n8n-chat-widget .chat-input button:active {
             transform: scale(0.95);
@@ -220,12 +222,12 @@
     const styleEl = document.createElement('style');
     styleEl.textContent = styles;
     document.head.appendChild(styleEl);
-    
+
     // Widget container
     const widgetContainer = document.createElement('div');
     widgetContainer.className = 'n8n-chat-widget';
     document.body.appendChild(widgetContainer);
-    
+
     // Toggle button
     const toggleButton = document.createElement('button');
     toggleButton.className = 'chat-toggle';
@@ -236,53 +238,53 @@
         </svg>
     `;
     widgetContainer.appendChild(toggleButton);
-    
+
     // Chat container
     const chatContainer = document.createElement('div');
     chatContainer.className = 'chat-container';
     widgetContainer.appendChild(chatContainer);
-    
+
     // Brand header with mascot
     const brandHeader = document.createElement('div');
     brandHeader.className = 'brand-header';
     brandHeader.innerHTML = `
         <div class="mascot" title="Mascot">${settings.mascot}</div>
         ${settings.brandName}
-        <button class="close-button" aria-label="Close chat">×</button>
+        <button aria-label="Close chat" class="close-button">×</button>
     `;
     chatContainer.appendChild(brandHeader);
-    
+
     // Chat messages area
     const messagesContainer = document.createElement('div');
     messagesContainer.className = 'chat-messages';
     chatContainer.appendChild(messagesContainer);
-    
+
     // Chat input area with SVG send icon
     const chatInput = document.createElement('div');
     chatInput.className = 'chat-input';
     chatInput.innerHTML = `
         <textarea placeholder="Type your message..." rows="1"></textarea>
-        <button type="submit" aria-label="Send">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+        <button aria-label="Send" type="submit">
+            <svg fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
             </svg>
         </button>
     `;
     chatContainer.appendChild(chatInput);
-    
+
     // Show/hide chat
     toggleButton.addEventListener('click', () => {
         chatContainer.classList.toggle('open');
     });
-    
+
     brandHeader.querySelector('.close-button').addEventListener('click', () => {
         chatContainer.classList.remove('open');
     });
-    
+
     // Send message logic
     const textarea = chatInput.querySelector('textarea');
     const sendButton = chatInput.querySelector('button');
-    
+
     sendButton.addEventListener('click', async () => {
         const message = textarea.value.trim();
         if (message) {
@@ -292,7 +294,7 @@
             messagesContainer.appendChild(userMessageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
             textarea.value = '';
-            
+
             // Send to webhook if configured
             if (settings.webhookUrl) {
                 try {
@@ -303,7 +305,7 @@
                         },
                         body: JSON.stringify({ message: message })
                     });
-                    
+
                     if (response.ok) {
                         const data = await response.json();
                         if (data.response) {
@@ -320,7 +322,7 @@
             }
         }
     });
-    
+
     textarea.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
